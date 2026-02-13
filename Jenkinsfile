@@ -1,14 +1,18 @@
 pipeline {
     agent any
 
+    environment {
+        APP_NAME = "flask-backend"
+    }
+
     stages {
-        stage('Clone Code') {
+        stage('Clone') {
             steps {
                 git 'https://github.com/rahulgowda18/flask-backend.git'
             }
         }
 
-        stage('Setup Virtual Environment') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
                 python3 -m venv venv
@@ -20,7 +24,7 @@ pipeline {
 
         stage('Restart App') {
             steps {
-                sh 'pm2 restart flask-app || pm2 start app.py --name flask-app --interpreter ./venv/bin/python'
+                sh 'pm2 restart flask-backend || pm2 start "venv/bin/python app.py" --name flask-backend'
             }
         }
     }
