@@ -1,22 +1,26 @@
 pipeline {
     agent any
+
     stages {
-        stage('Clone Repo') {
+        stage('Clone Code') {
             steps {
                 git 'https://github.com/rahulgowda18/flask-backend.git'
             }
         }
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t flask-app .'
-            }
-        }
-        stage('Deploy Container') {
+
+        stage('Setup Virtual Environment') {
             steps {
                 sh '''
-                docker rm -f flask-container || true
-                docker run -d -p 5000:5000 --name flask-container flask-app
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install -r requirements.txt
                 '''
+            }
+        }
+
+        stage('Restart App') {
+            steps {
+                sh 'pm2 restart flask-app || pm2 start app.py --name flask-app --interpreter ./venv/bin/python'
             }
         }
     }
